@@ -1,6 +1,3 @@
-//http://www.thecrazyprogrammer.com/2015/09/round-robin-scheduling-program-in-c.html
-//        http://ducslectures.blogspot.com/p/write-program-to-implement-sjf_23.html
-
 /*
  * Round-Robin Scheduling by Pedro Faria
  * Politechnika Krakowska im. Tadeusza Kościuszki
@@ -24,7 +21,6 @@ public:
     int arrival_time;
     int turnAround_time;
     int waiting_time;
-    int finish_time;
     int time_left;
     Process(int bt, int at);
 };
@@ -78,7 +74,6 @@ void RoundRobin::initRR()
     for(int i=0; i<nr_proc; i++)
     {
         processes[i].time_left=processes[i].burst_time;
-        processes[i].finish_time=0;
         processes[i].waiting_time = 0;
         processes[i].turnAround_time = 0;
         totalProcessTime+=processes[i].burst_time;
@@ -88,14 +83,12 @@ void RoundRobin::initRR()
 void RoundRobin::displayTime()
 {
 
-    cout<<"\n\nProcess\t|TurnAround Time|Waiting Time\n";
+    cout<<"\n\n--------------------------------------\n";
+    cout<<"Process\t|TurnAround Time|Waiting Time\n";
     cout<<"--------+---------------+-------------\n";
     for(int i=0;i<nr_proc;i++)
     {
-
-        totalWaitTime+= processes[i].waiting_time;
         processes[i].turnAround_time= processes[i].waiting_time+processes[i].burst_time;
-        totalTurnAroundTime+=processes[i].turnAround_time;
         cout<<"P("<< i+1 <<")\t|\t"<< processes[i].turnAround_time <<"\t|\t"<<  processes[i].waiting_time <<"\n";
 
     }
@@ -111,104 +104,53 @@ void RoundRobin::computeRR(){
     inputData();
     initRR();
     int currentTime;
-    int i, j;
+    int i;
     int time_quantum;
-    int dec = 0;
     cout<<"Enter the time quantum:\n";
     cin>>time_quantum;
 
     cout<<"\n--------------------------------------\n";
-    cout<<"Gantt Chart\n ";
+    cout<<"Gantt Chart\n";
     cout<<"--------------------------------------\n";
 
-    for(currentTime=0;currentTime<totalProcessTime;)
+    for(currentTime=0,i=0;remain_processes!=0;)
     {
-        for(i=0;i<nr_proc;i++)
+        cout<<"("<<currentTime<<")|==P"<<(i+1)<<"==|";
+
+        if(processes[i].time_left<=time_quantum && processes[i].time_left>0)
         {
-            if(processes[i].arrival_time<=currentTime && processes[i].finish_time==0)
-            {
-
-                cout<<"("<<currentTime<<")|==P"<<(i+1)<<"==|";
-                if(processes[i].time_left<time_quantum){
-                    dec=processes[i].time_left;
-                }
-                else {
-                    dec=time_quantum;
-                }
-
-                processes[i].time_left=processes[i].time_left-dec;
-
-                if(processes[i].time_left==0)
-                    processes[i].finish_time=1;
-
-                for(j=0;j<nr_proc;j++)
-                    if(j!=i && processes[j].finish_time==0 && processes[i].arrival_time<=currentTime)
-                        processes[i].waiting_time+=dec;
-
-                currentTime=currentTime+dec;
-
-            }
-
+            currentTime+=processes[i].time_left;
+            processes[i].time_left=0;
+            flag=1;
         }
-
+        else if(processes[i].time_left>0)
+        {
+            processes[i].time_left-=time_quantum;
+            currentTime+=time_quantum;
+        }
+        if(processes[i].time_left==0 && flag==1)
+        {
+            remain_processes--;
+            processes[i].turnAround_time = currentTime-processes[i].arrival_time;
+            processes[i].waiting_time = currentTime-processes[i].arrival_time-processes[i].burst_time;
+            totalWaitTime+=currentTime-processes[i].arrival_time-processes[i].burst_time;
+            totalTurnAroundTime+=currentTime-processes[i].arrival_time;
+            flag=0;
+        }
+        if(i==nr_proc-1)
+            i=0;
+        else if(processes[i+1].arrival_time<=currentTime)
+            i++;
+        else
+            i=0;
     }
 
     cout<<"("<<totalProcessTime<<")"<<endl;
     displayTime();
 }
 
-void rr2(){
-    int count,j,n,time,remain,flag=0,time_quantum;
-    int wait_time=0,turnaround_time=0,at[10],bt[10],rt[10];
-    printf("Enter Total Process:\t ");
-    scanf("%d",&n);
-    remain=n;
-    for(count=0;count<n;count++)
-    {
-        printf("Enter Arrival Time and Burst Time for Process Process Number %d :",count+1);
-        scanf("%d",&at[count]);
-        scanf("%d",&bt[count]);
-        rt[count]=bt[count];
-    }
-    printf("Enter Time Quantum:\t");
-    scanf("%d",&time_quantum);
-    printf("\n\nProcess\t|Turnaround Time|Waiting Time\n\n");
-    for(time=0,count=0;remain!=0;)
-    {
-        if(rt[count]<=time_quantum && rt[count]>0)
-        {
-            time+=rt[count];
-            rt[count]=0;
-            flag=1;
-        }
-        else if(rt[count]>0)
-        {
-            rt[count]-=time_quantum;
-            time+=time_quantum;
-        }
-        if(rt[count]==0 && flag==1)
-        {
-            remain--;
-            printf("P[%d]\t|\t%d\t|\t%d\n",count+1,time-at[count],time-at[count]-bt[count]);
-            wait_time+=time-at[count]-bt[count];
-            turnaround_time+=time-at[count];
-            flag=0;
-        }
-        if(count==n-1)
-            count=0;
-        else if(at[count+1]<=time)
-            count++;
-        else
-            count=0;
-    }
-    printf("\nAverage Waiting Time= %f\n",wait_time*1.0/n);
-    printf("Avg Turnaround Time = %f",turnaround_time*1.0/n);
-}
-
 int main()
 {
     RoundRobin rr;
     rr.computeRR();
-
-    rr2();
 }
