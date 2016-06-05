@@ -8,11 +8,11 @@ On this program, it can be observed a little Gantt chart on how the processes ar
 ##2 - Interface
 It is displayed a small and simple interface when executing the program. <br/>
 Will be asked the inputs in the following order: <br/>
-1.	Number of processes to schedule; <br/>
-2.	Burst and Arrival time for each process; <br/>
-3.	Time Quantum for the scheduling. <br/>
-<img src="https://github.com/PedroDiasFaria/PK-RoundRobin.cpp/blob/master/rrinterface1.png"/> 
+1. Number of processes to schedule; <br/>
+2. Burst and Arrival time for each process; <br/>
+3. Time Quantum for the scheduling. <br/>
+<img src="https://github.com/PedroDiasFaria/PK-RoundRobin.cpp/blob/master/rrinterface1.png"/> <br/>
 
 After the inputs, it will be displayed the Gantt chart and a small Statistics table: <br/>
-<img src="https://github.com/PedroDiasFaria/PK-RoundRobin.cpp/blob/master/rrinterface2.png"/> 
+<img src="https://github.com/PedroDiasFaria/PK-RoundRobin.cpp/blob/master/rrinterface2.png"/> <br/>
 (Example used from https://pt.wikipedia.org/wiki/Round-robin) 
